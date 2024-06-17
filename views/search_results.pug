@@ -1,0 +1,54 @@
+extends layout
+
+block content
+    .container
+        h1 Resultados de la Búsqueda
+        if users.length > 0
+            table.table.table-striped
+                thead
+                    tr
+                        th ID
+                        th Nombre Completo
+                        th Nombre de Usuario
+                        th Rol
+                        th Acciones
+                tbody
+                    each user in users
+                        tr
+                            td #{user.id}
+                            td #{user.fullname}
+                            td #{user.username}
+                            td #{user.role}
+                            td
+                                a(href=`/users/${user.id}/edit` class='btn btn-warning btn-sm mr-2') Editar
+                                form(action=`/users/${user.id}/delete` method='POST' class='d-inline delete-form')
+                                    button(type='button' class='btn btn-danger btn-sm delete-btn') Eliminar
+        else
+            p No se encontraron usuarios con el rol especificado.
+        a(href="/users" class='btn btn-primary mt-3') Volver a la lista de usuarios
+    // Confirmación de eliminación
+    .confirmation-overlay#confirmation-overlay
+        .confirmation-box
+            p ¿Estás seguro de que deseas eliminar este usuario?
+            button(type='button' class='btn btn-danger mr-2' id='confirm-delete') Sí
+            button(type='button' class='btn btn-secondary' id='cancel-delete') Cancelar
+    script.
+        document.addEventListener('DOMContentLoaded', () => {
+            const deleteBtns = document.querySelectorAll('.delete-btn');
+            const confirmationOverlay = document.getElementById('confirmation-overlay');
+            const confirmDeleteBtn = document.getElementById('confirm-delete');
+            const cancelDeleteBtn = document.getElementById('cancel-delete');
+
+            deleteBtns.forEach(btn => {
+                btn.addEventListener('click', function(event) {
+                    event.preventDefault();
+                    confirmationOverlay.style.display = 'flex';
+                    confirmDeleteBtn.onclick = () => {
+                        btn.closest('form').submit();
+                    };
+                    cancelDeleteBtn.onclick = () => {
+                        confirmationOverlay.style.display = 'none';
+                    };
+                });
+            });
+        });

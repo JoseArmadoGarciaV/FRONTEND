@@ -2,24 +2,53 @@ extends layout
 
 block content
     .container
-    h1 Lista de Usuarios
-    a(href='/users/new' class='btn btn-primary mb-3') Crear nuevo usuario
-    table.table.table-striped
-        thead
-            tr
-                th ID
-                th Nombre Completo
-                th Nombre de Usuario
-                th Rol
-                th Acciones
-        tbody
-            each user in users
+        h1 Lista de Usuarios
+        a(href='/users/new' class='btn btn-primary mb-3') Crear nuevo usuario
+        form(action="/users/search" method="get" target="_blank" class='form-inline mb-3')
+            input(type="text" name="role" placeholder="Buscar por rol" class='form-control mr-2')
+            button(type="submit" class='btn btn-outline-primary') Buscar
+        table.table.table-striped
+            thead
                 tr
-                    td #{user.id}
-                    td #{user.fullname}
-                    td #{user.username}
-                    td #{user.role}
-                    td
-                        a(href=`/users/${user.id}/edit` class='btn btn-warning btn-sm mr-2') Editar
-                        form(action=`/users/${user.id}/delete` method='POST' style='display:inline')
-                            button(type='submit' class='btn btn-danger btn-sm') Eliminar
+                    th ID
+                    th Nombre Completo
+                    th Nombre de Usuario
+                    th Rol
+                    th Acciones
+            tbody
+                each user in users
+                    tr
+                        td #{user.id}
+                        td #{user.fullname}
+                        td #{user.username}
+                        td #{user.role}
+                        td
+                            a(href=`/users/${user.id}/edit` class='btn btn-warning btn-sm mr-2') Editar
+                            form(action=`/users/${user.id}/delete` method='POST' class='d-inline delete-form')
+                                button(type='button' class='btn btn-danger btn-sm delete-btn') Eliminar
+    // Confirmación de eliminación
+    .confirmation-overlay#confirmation-overlay
+        .confirmation-box
+            p ¿Estás seguro de que deseas eliminar este usuario?
+            button(type='button' class='btn btn-danger mr-2' id='confirm-delete') Sí
+            button(type='button' class='btn btn-secondary' id='cancel-delete') Cancelar
+    script.
+        document.addEventListener('DOMContentLoaded', () => {
+            const deleteBtns = document.querySelectorAll('.delete-btn');
+            const confirmationOverlay = document.getElementById('confirmation-overlay');
+            const confirmDeleteBtn = document.getElementById('confirm-delete');
+            const cancelDeleteBtn = document.getElementById('cancel-delete');
+
+            deleteBtns.forEach(btn => {
+                btn.addEventListener('click', function(event) {
+                    event.preventDefault();
+                    confirmationOverlay.style.display = 'flex';
+                    confirmDeleteBtn.onclick = () => {
+                        btn.closest('form').submit();
+                    };
+                    cancelDeleteBtn.onclick = () => {
+                        confirmationOverlay.style.display = 'none';
+                    };
+                });
+            });
+        });

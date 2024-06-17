@@ -2,6 +2,7 @@ const express = require('express');
 const router = express.Router();
 const User = require('../models/User');
 
+
 // Obtener todos los usuarios
 router.get('/', async (req, res) => {
     const users = await User.findAll();
@@ -41,6 +42,15 @@ router.post('/:id/delete', async (req, res) => {
         where: { id: req.params.id }
     });
     res.redirect('/users');
+});
+
+// Buscar usuarios por rol y mostrar resultados en una nueva vista
+router.get('/search', async (req, res) => {
+    const { role } = req.query;
+    const users = await User.findAll({
+        where: { role }
+    });
+    res.render('search_results', { users });
 });
 
 module.exports = router;
